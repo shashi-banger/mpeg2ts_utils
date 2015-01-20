@@ -24,7 +24,7 @@ given on command line.
 
 get_pid_pts_fileoffset: Reads a ts file and creates a csv with each line having
 following entry: pid, PTS_in_ms , byte_offset_in_file
-   
-   Usage: ./get_pid_pts_fileoffset  input_ts_file   out_csv_file 
+
+    Usage: /get_pid_pts_fileoffset input_ts_file out_csv_file
 
 
