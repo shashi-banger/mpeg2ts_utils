@@ -25,4 +25,11 @@ ADD_EXECUTABLE(ts_re_time_stamp
                 ${MPEG2TS_UTILS_SOURCE_DIR}/utils/ts_re_time_stamp.cpp)
 TARGET_LINK_LIBRARIES(ts_re_time_stamp stdc++)
 
+ADD_EXECUTABLE(get_pid_pts_fileoffset 
+                ${MPEG2TS_UTILS_SOURCE_DIR}/utils/get_pid_pts_fileoffset.cpp)
+TARGET_LINK_LIBRARIES(get_pid_pts_fileoffset stdc++)
+
+ADD_EXECUTABLE(extract_es 
+                ${MPEG2TS_UTILS_SOURCE_DIR}/utils/extract_es.cpp)
+TARGET_LINK_LIBRARIES(extract_es stdc++)
 

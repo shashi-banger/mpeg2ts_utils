@@ -64,8 +64,16 @@ int main(int argc, char *argv[])
             pes_data = ts_payload(ts_pkt);
             if(pes_has_pts(pes_data))
             {
+                unsigned char *pes_pld;
                 curr_pes_pts = pes_get_pts(pes_data);
                 ofs << inp_pid << "," << curr_pes_pts/90 << "," << ifs.tellg() << std::endl;
+                pes_pld = pes_payload(pes_data);
+                //ofs << std::hex << pes_pld[0] << " " << pes_pld[1] << " " << pes_pld[2] << " " << std::endl;
+                //ofs << pes_pld[0] << " " << pes_pld[1] << " " << pes_pld[2] << " " << std::endl;
+            }
+            else
+            {
+                ofs << inp_pid << "," << INVALID_PTS/90 << "," << ifs.tellg() << std::endl;
             }
         }
         n_pkts++;
