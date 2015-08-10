@@ -43,3 +43,7 @@ ADD_EXECUTABLE(convert_192_to_188_bytes
                 ${MPEG2TS_UTILS_SOURCE_DIR}/utils/convert_192_to_188_bytes.cpp)
 TARGET_LINK_LIBRARIES(convert_192_to_188_bytes stdc++)
 
+ADD_EXECUTABLE(pid_retimestamp 
+                ${MPEG2TS_UTILS_SOURCE_DIR}/utils/pid_retimestamp.cpp)
+TARGET_LINK_LIBRARIES(pid_retimestamp stdc++)
+
