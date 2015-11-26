@@ -64,6 +64,15 @@ int main(int argc, char *argv[])
                                 (int64_t)(curr_pes_pts - g_file_first_pts);
                 pes_set_pts(pes_data, new_pes_pts);
             }
+            if(pes_has_dts(pes_data))
+            {
+                uint64_t       curr_pes_dts;
+                uint64_t       new_pes_dts;
+                curr_pes_dts = pes_get_dts(pes_data);
+                new_pes_dts  = out_start_file_pts +
+                    (int64_t)(curr_pes_dts - g_file_first_pts);
+                pes_set_dts(pes_data, new_pes_dts);
+            }
         }
 
 
