@@ -90,14 +90,14 @@ int main(int argc, char *argv[])
         ifs.read((char*)ts_pkt, 188);
         inp_pid = ts_get_pid(ts_pkt);
 
-        if(ts_has_adaptation(ts_pkt))
+        if(ts_has_adaptation(ts_pkt) && ts_get_adaptation(ts_pkt) > 0)
         {
             if(tsaf_has_pcr(ts_pkt))
             {
                 curr_pcr = tsaf_get_pcr(ts_pkt);
                 pcr_ext = tsaf_get_pcrext(ts_pkt);
-                //curr_pcr = (300 * pcr_ext) + curr_pcr;
-                printf("%d %lld %lld\n", inp_pid, curr_pcr/(300 * 90), (int64_t)ifs.tellg());
+                curr_pcr = (300 * curr_pcr) + pcr_ext;
+                printf("%d %lld %lld %d\n", inp_pid, curr_pcr/(300 * 90), (int64_t)ifs.tellg(), ts_get_unitstart(ts_pkt));
             }
         }
         n_pkts++;

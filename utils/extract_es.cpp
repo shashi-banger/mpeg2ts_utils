@@ -74,10 +74,18 @@ int main(int argc, char *argv[])
 
             printf("pts=%llu, diff = %d, last_pes_size=%d\n", curr_pes_pts/90, (int)((curr_pes_pts - prev_pes_pts)/90),  cur_es_size);
 
-            /*printf("======Got pes start %x %x %x %x %x %x %x %x\n", pes_data[0], pes_data[1], pes_data[2], pes_data[3], pes_data[4], pes_data[5],
+#if 0
+            printf("======Got pes start %x %x %x %x %x %x %x %x\n", pes_data[0], pes_data[1], pes_data[2], pes_data[3], pes_data[4], pes_data[5],
                                                             pes_data[6], pes_data[7]);
             printf("======Got pes start %x %x %x %x %x %x %x %x\n", payload[0], payload[1], payload[2], payload[3], payload[4], payload[5],
-                                                            payload[6], payload[7]); */
+                                                            payload[6], payload[7]);
+
+            if(payload[0] != 0xff) {
+                /* Not aac header ABORT */
+                printf("not AAC header abort\n");
+                //abort();
+            }
+#endif //0
             if(pes_get_dataalignment(pes_data))
             {
                 printf("##########Got data alignmednt\n");
