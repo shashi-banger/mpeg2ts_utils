@@ -75,8 +75,7 @@ int main(int argc, char *argv[])
             }
         }
 
-
-        if(ts_has_adaptation(ts_pkt))
+        if(ts_has_adaptation(ts_pkt) && ts_get_adaptation(ts_pkt) > 0)
         {
             if(tsaf_has_pcr(ts_pkt))
             {
@@ -97,7 +96,7 @@ int main(int argc, char *argv[])
                 }
             }
         }
-
+#endif //0
 
         if(g_file_first_pts != INVALID_PTS)
             ofs.write((char*)ts_pkt, 188);
