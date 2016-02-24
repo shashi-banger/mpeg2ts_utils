@@ -32,6 +32,7 @@ int main(int argc, char *argv[])
     int  n_pkts = 0;
     pid_info_t     curr_pid_info;
     uint64_t       curr_pes_pts;
+    uint64_t       curr_pes_dts;
 
     ifs.open(inp_filename, std::ios::in);
     if(!ifs.is_open()) {
@@ -60,21 +61,24 @@ int main(int argc, char *argv[])
 
         if(ts_get_unitstart(ts_pkt))
         {
+            curr_pes_pts = INVALID_PTS;
+            curr_pes_dts = INVALID_PTS;
             /* If pes present */
             pes_data = ts_payload(ts_pkt);
             if(pes_has_pts(pes_data))
             {
                 unsigned char *pes_pld;
                 curr_pes_pts = pes_get_pts(pes_data);
-                ofs << inp_pid << "," << curr_pes_pts/90 << "," << ifs.tellg() << std::endl;
                 pes_pld = pes_payload(pes_data);
                 //ofs << std::hex << pes_pld[0] << " " << pes_pld[1] << " " << pes_pld[2] << " " << std::endl;
                 //ofs << pes_pld[0] << " " << pes_pld[1] << " " << pes_pld[2] << " " << std::endl;
             }
-            else
+            if(pes_has_dts(pes_data))
             {
-                ofs << inp_pid << "," << INVALID_PTS/90 << "," << ifs.tellg() << std::endl;
+                curr_pes_dts = pes_get_dts(pes_data);
             }
+            ofs << inp_pid << "," << curr_pes_pts/90 << "," << curr_pes_dts/90 << ","
+                << ifs.tellg() << std::endl;
         }
         n_pkts++;
         //std::cout << n_pkts <<std::endl;

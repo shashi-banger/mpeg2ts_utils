@@ -11,7 +11,8 @@ SET(CMAKE_CXX_FLAGS "-g -Wall" )
 SET( CMAKE_CXX_FLAGS_RELEASE "-g -Wall")
 ADD_DEFINITIONS(-D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 )
 
-INCLUDE_DIRECTORIES(${MPEG2TS_UTILS_SOURCE_DIR})
+INCLUDE_DIRECTORIES(${MPEG2TS_UTILS_SOURCE_DIR}
+                    ${MPEG2TS_UTILS_SOURCE_DIR}/inc)
 
 SET(EXECUTABLE_OUTPUT_PATH ${MPEG2TS_UTILS_SOURCE_DIR}/bin)
 
@@ -47,3 +48,8 @@ ADD_EXECUTABLE(pid_retimestamp
                 ${MPEG2TS_UTILS_SOURCE_DIR}/utils/pid_retimestamp.cpp)
 TARGET_LINK_LIBRARIES(pid_retimestamp stdc++)
 
+ADD_EXECUTABLE(get_file_duration 
+                ${MPEG2TS_UTILS_SOURCE_DIR}/utils/get_file_duration.cpp
+                ${MPEG2TS_UTILS_SOURCE_DIR}/src/ts_parse_file_utils.cpp
+                )
+TARGET_LINK_LIBRARIES(get_file_duration stdc++)

@@ -26,7 +26,7 @@ for l in f:
     w = l.split(',')
     l_pid = int(w[0])
     if l_pid in pids:
-        pid_data[l_pid]['x'].append(int(w[2]))
+        pid_data[l_pid]['x'].append(int(w[3]))
         pid_data[l_pid]['y'].append(int(w[1]))
 #plt.plot(x,y, label='video pts', x1, y1, label='audio pts')
 
