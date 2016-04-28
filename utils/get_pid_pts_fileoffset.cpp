@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
                 curr_pes_dts = pes_get_dts(pes_data);
             }
             ofs << inp_pid << "," << curr_pes_pts/90 << "," << curr_pes_dts/90 << ","
-                << ifs.tellg() << std::endl;
+                << ifs.tellg() -188 << std::endl;
         }
         n_pkts++;
         //std::cout << n_pkts <<std::endl;
