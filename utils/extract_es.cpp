@@ -123,6 +123,7 @@ int main(int argc, char *argv[])
         n_pkts++;
         //std::cout << n_pkts <<std::endl;
     }
+    printf("last_pes_size=%d\n", cur_es_size);
     std::cout << "Completed" << std::endl;
 }
 
