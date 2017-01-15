@@ -26,8 +26,8 @@ for l in f:
     w = l.split(',')
     l_pid = int(w[0])
     if l_pid in pids:
-        pid_data[l_pid]['x'].append(int(w[3]))
-        pid_data[l_pid]['y'].append(int(w[1]))
+        pid_data[l_pid]['x'].append(int(w[4]))
+        pid_data[l_pid]['y'].append(int(w[2]))
 #plt.plot(x,y, label='video pts', x1, y1, label='audio pts')
 
 pts = {}
@@ -36,6 +36,7 @@ for p in pids:
     pts[p] = np.array(pid_data[p]['y'])
     pts[p].sort()
     pts_diff[p] = pts[p][1:pts[p].size] - pts[p][0:pts[p].size-1]
+    print pts_diff[p]
 
 
 
