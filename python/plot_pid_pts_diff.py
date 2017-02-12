@@ -32,19 +32,25 @@ for l in f:
 
 pts = {}
 pts_diff = {}
+max_diff = 0
+min_diff = 100000000000000000000000
 for p in pids:
     pts[p] = np.array(pid_data[p]['y'])
     pts[p].sort()
     pts_diff[p] = pts[p][1:pts[p].size] - pts[p][0:pts[p].size-1]
+    if max(pts_diff[p]) > max_diff:
+        max_diff = max(pts_diff[p])
+    if min(pts_diff[p]) < min_diff:
+        min_diff = min(pts_diff[p])
     print pts_diff[p]
 
 
 
-plt.ylim([0,200])
+plt.ylim([(min_diff - 100),(max_diff +200)])
 lab = []
 for pid in pids:
    print pid
-   s = plt.plot(pid_data[pid]['y'][1:], pts_diff[pid], label='%d pts' % pid)
+   s = pt.plot(pid_data[pid]['y'][1:], pts_diff[pid], label='%d pts' % pid)
    lab.append(s)
 
 plt.grid(True)
