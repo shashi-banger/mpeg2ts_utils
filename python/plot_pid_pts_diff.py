@@ -50,7 +50,7 @@ plt.ylim([(min_diff - 100),(max_diff +200)])
 lab = []
 for pid in pids:
    print pid
-   s = pt.plot(pid_data[pid]['y'][1:], pts_diff[pid], label='%d pts' % pid)
+   s = plt.plot(pid_data[pid]['y'][1:], pts_diff[pid], label='%d pts' % pid)
    lab.append(s)
 
 plt.grid(True)

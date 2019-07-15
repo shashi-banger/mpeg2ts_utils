@@ -1,5 +1,3 @@
-
-
 #include <iostream>
 #include <fstream>
 #include <map>
@@ -25,6 +23,7 @@ typedef struct _pcr_derive_info {
 static void check_and_note_pcr_info(pcr_derive_info  *pcr_info,  unsigned char *ts_pkt)
 {
     uint64_t  pcr_ext;
+    static uint64_t tot_bytes = 0;
 
     if(ts_has_adaptation(ts_pkt) && ts_get_adaptation(ts_pkt) > 0)
     {
@@ -35,8 +34,8 @@ static void check_and_note_pcr_info(pcr_derive_info  *pcr_info,  unsigned char *
             pcr_info->prev_pcr      = tsaf_get_pcr(ts_pkt);
             pcr_ext = tsaf_get_pcrext(ts_pkt);
             pcr_info->prev_pcr = (300 * pcr_info->prev_pcr) + pcr_ext;
-            /*printf("%d %lld %lld %d\n", inp_pid, curr_pcr/(300 * 90),
-              (int64_t)ifs.tellg()/188, ts_get_unitstart(ts_pkt));*/
+            printf("%ld %ld %d\n", pcr_info->prev_pcr,
+                   tot_bytes, ts_get_unitstart(ts_pkt));
             pcr_info->bytes_bet_last_2_pcrs = pcr_info->bytes_since_last_pcr;
             pcr_info->bytes_since_last_pcr = 0;
         }
@@ -49,6 +48,7 @@ static void check_and_note_pcr_info(pcr_derive_info  *pcr_info,  unsigned char *
     {
         pcr_info->bytes_since_last_pcr += TS_SIZE;
     }
+    tot_bytes += TS_SIZE;
 }
 
 static uint64_t  get_cur_pcr(pcr_derive_info  *pcr_info)
@@ -133,9 +133,13 @@ int main(int argc, char *argv[])
             if(pes_has_pts(pes_data))
             {
                 unsigned char *pes_pld;
+                char   str1[1024];
                 curr_pes_pts = pes_get_pts(pes_data);
                 pes_pld = pes_payload(pes_data);
-                //ofs << std::hex << pes_pld[0] << " " << pes_pld[1] << " " << pes_pld[2] << " " << std::endl;
+                //sprintf(str1, "%x %x %x %x", pes_pld[0], pes_pld[1], pes_pld[2], pes_pld[3]);
+                //if(inp_pid == 2068)
+                    //ofs << "##2068 " << str1 << std::endl;
+                    //ofs << std::hex << pes_pld[0] << " " << pes_pld[1] << " " << pes_pld[2] << " " << std::hex<<std::endl;
                 //ofs << pes_pld[0] << " " << pes_pld[1] << " " << pes_pld[2] << " " << std::endl;
             }
             if(pes_has_dts(pes_data))
@@ -145,9 +149,18 @@ int main(int argc, char *argv[])
             cur_pcr = get_cur_pcr(&pcr_info);
             if(cur_pcr != (uint64_t)(-1))
             {
-                ofs << inp_pid << "," << cur_pcr/(300 * 90) << "," << curr_pes_pts/90 << "," <<
-                    curr_pes_dts/90 <<
-                    "," << cur_pos << std::endl;
+                if(curr_pes_dts != INVALID_PTS)
+                {
+                    ofs << inp_pid << "," << cur_pcr/(300 * 90) << "," << curr_pes_pts/90 << "," <<
+                        curr_pes_dts/90 <<
+                        "," << cur_pos << "," <<  (curr_pes_pts - curr_pes_dts)/90 << std::endl;
+                }
+                else
+                {
+                    ofs << inp_pid << "," << cur_pcr/(300 * 90) << "," << curr_pes_pts/90 << "," <<
+                         -1 <<
+                        "," << cur_pos << "," << -1 << std::endl;
+                }
             }
         }
         n_pkts++;
@@ -155,5 +168,3 @@ int main(int argc, char *argv[])
     }
     std::cout << "Completed" << std::endl;
 }
-
-
