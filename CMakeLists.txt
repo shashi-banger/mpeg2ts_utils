@@ -6,8 +6,8 @@ PROJECT(MPEG2TS_UTILS C CXX)
 #SET(CMAKE_CXX_COMPILER arm-none-linux-gnueabi-gcc )
 SET(CMAKE_C_COMPILER gcc  )
 SET(CMAKE_CXX_COMPILER gcc )
-SET(CMAKE_CXX_FLAGS "-g -Wall" )
-SET( CMAKE_CXX_FLAGS_RELEASE "-g -Wall")
+SET(CMAKE_CXX_FLAGS "-g -Wall -fpermissive" )
+SET( CMAKE_CXX_FLAGS_RELEASE "-g -Wall -fpermissive")
 ADD_DEFINITIONS(-D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 )
 
 INCLUDE_DIRECTORIES(${MPEG2TS_UTILS_SOURCE_DIR}
@@ -55,3 +55,6 @@ TARGET_LINK_LIBRARIES(get_file_duration stdc++)
 
 ADD_EXECUTABLE(utc_to_pts_map
                 ${MPEG2TS_UTILS_SOURCE_DIR}/utils/utc_to_pts_map.cpp)
+
+ADD_EXECUTABLE(scte_packet_reader
+        ${MPEG2TS_UTILS_SOURCE_DIR}/utils/scte_packet_reader.cpp)

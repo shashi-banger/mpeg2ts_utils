@@ -17,7 +17,7 @@ for s in sys.argv[2:]:
     pids.append(int(s))
 
 pid_data = {int(p) : {'x' : [], 'y' : []} for p in pids}
-print pid_data
+print(pid_data)
 
 v = []
 a = []
@@ -42,15 +42,16 @@ for p in pids:
         max_diff = max(pts_diff[p])
     if min(pts_diff[p]) < min_diff:
         min_diff = min(pts_diff[p])
-    print pts_diff[p]
+    print(pts_diff[p])
 
 
 
 plt.ylim([(min_diff - 100),(max_diff +200)])
 lab = []
 for pid in pids:
-   print pid
-   s = plt.plot(pid_data[pid]['y'][1:], pts_diff[pid], label='%d pts' % pid)
+   print(pid)
+   #s = plt.plot(np.array(pid_data[pid]['y'][1:])/1000., pts_diff[pid], label='%d pts' % pid)
+   s = plt.plot(pts[pid][1:]/1000., pts_diff[pid], label='%d pts' % pid)
    lab.append(s)
 
 plt.grid(True)

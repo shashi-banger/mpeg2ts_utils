@@ -17,7 +17,7 @@ for s in sys.argv[2:]:
     pids.append(int(s))
 
 pid_data = {int(p) : {'x' : [], 'y' : []} for p in pids}
-print pid_data
+print(pid_data)
 v = []
 a = []
 
@@ -25,7 +25,7 @@ for l in f:
     w = l.split(',')
     l_pid = int(w[0])
     if l_pid in pids:
-        diff = int(w[2]) - int(w[1])
+        diff = (int(w[2]) - int(w[1]))&0x1ffffffff
         pid_data[l_pid]['x'].append(int(w[4]))
         pid_data[l_pid]['y'].append(int(diff))
 
@@ -33,7 +33,7 @@ for l in f:
 
 lab = []
 for pid in pids:
-   print pid
+   print(pid)
    s = plt.plot(pid_data[pid]['x'], pid_data[pid]['y'], label='%d pts' % pid)
    lab.append(s)
 

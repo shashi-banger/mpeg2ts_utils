@@ -6,7 +6,7 @@
 #include "bitstream/mpeg/ts.h"
 #include "bitstream/mpeg/pes.h"
 
-#define USAGE "./ts_re_time_stamp <input_ts_file> <out_ts_file> <start_pts>"
+#define USAGE "./ts_re_time_stamp <input_ts_file> <out_ts_file> <start_pts(should correspond to first video pts of new ts)>"
 
 #define INVALID_PTS 0xffffffffffffULL
 
@@ -32,6 +32,40 @@ int main(int argc, char *argv[])
     int  n_pkts = 0;
     uint64_t       curr_pes_pts;
     uint64_t       new_pes_pts;
+    int pid;
+
+    ifs.open(inp_filename, std::ios::in);
+    if(!ifs.is_open()) {
+        std::cout << "Unable to open " << inp_filename;
+        exit(1);
+    }
+
+    /* Scan input for the first PTS correspnfing to input reference pid */
+    while(!ifs.eof()) {
+        ifs.read((char*)ts_pkt, 188);
+        pid = ts_get_pid(ts_pkt);
+
+        if(ts_get_unitstart(ts_pkt))
+        {
+            uint8_t  stream_id;
+            /* If pes present */
+            pes_data = ts_payload(ts_pkt);
+            stream_id = pes_get_streamid(pes_data);
+            if((stream_id >= PES_STREAM_ID_VIDEO_MPEG) &  (stream_id < PES_STREAM_ID_ECM)) 
+            {
+                if(pes_has_pts(pes_data))
+                {
+                    curr_pes_pts = pes_get_pts(pes_data);
+                    g_file_first_pts = (g_file_first_pts == INVALID_PTS) ?
+                        curr_pes_pts : g_file_first_pts;
+                    std::cout << "First pts: " << g_file_first_pts << std::endl;
+                    break;
+                }
+            }
+            // else continue
+        }
+    }
+    ifs.close();
 
     ifs.open(inp_filename, std::ios::in);
     if(!ifs.is_open()) {
@@ -58,8 +92,8 @@ int main(int argc, char *argv[])
             if(pes_has_pts(pes_data))
             {
                 curr_pes_pts = pes_get_pts(pes_data);
-                g_file_first_pts = (g_file_first_pts == INVALID_PTS) ?
-                    curr_pes_pts : g_file_first_pts;
+                /*g_file_first_pts = (g_file_first_pts == INVALID_PTS) ?
+                    curr_pes_pts : g_file_first_pts;*/
                 new_pes_pts  = out_start_file_pts +
                                 (int64_t)(curr_pes_pts - g_file_first_pts);
                 pes_set_pts(pes_data, new_pes_pts);

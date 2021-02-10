@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
     pid_info_t     curr_pid_info;
     uint64_t       curr_pes_pts;
     uint64_t       curr_pes_dts;
-    pcr_derive_info   pcr_info;
+    pcr_derive_info   pcr_info = {0,};
     uint64_t          cur_pcr;
     uint64_t          cur_pos;
 
