@@ -1,12 +1,13 @@
 
 #include <iostream>
 #include <fstream>
+#include <stdlib.h>
 #include <map>
 #include <algorithm>
 #include "bitstream/mpeg/ts.h"
 #include "bitstream/mpeg/pes.h"
 
-#define USAGE "./ts_re_time_stamp <input_ts_file> <out_ts_file> <start_pts(should correspond to first video pts of new ts)>"
+#define USAGE "./ts_re_time_stamp <input_ts_file> <out_ts_file> <start_pts(should correspond to first video pts of new ts)> <duration_sec(e..g 4.8, 5.75 etc)>"
 
 #define INVALID_PTS 0xffffffffffffULL
 
@@ -33,11 +34,18 @@ int main(int argc, char *argv[])
     uint64_t       curr_pes_pts;
     uint64_t       new_pes_pts;
     int pid;
+    double  output_duration = -1.0;
+    int  vid_pid_num;
 
     ifs.open(inp_filename, std::ios::in);
     if(!ifs.is_open()) {
         std::cout << "Unable to open " << inp_filename;
         exit(1);
+    }
+
+    if(argc == 5) {
+        // Duration input is present in command line
+        output_duration = atof(argv[4]);
     }
 
     /* Scan input for the first PTS correspnfing to input reference pid */
@@ -53,6 +61,7 @@ int main(int argc, char *argv[])
             stream_id = pes_get_streamid(pes_data);
             if((stream_id >= PES_STREAM_ID_VIDEO_MPEG) &  (stream_id < PES_STREAM_ID_ECM)) 
             {
+                vid_pid_num = pid;
                 if(pes_has_pts(pes_data))
                 {
                     curr_pes_pts = pes_get_pts(pes_data);
@@ -83,7 +92,7 @@ int main(int argc, char *argv[])
 
     while(!ifs.eof()) {
         ifs.read((char*)ts_pkt, 188);
-        ts_get_pid(ts_pkt);
+        pid = ts_get_pid(ts_pkt);
 
         if(ts_get_unitstart(ts_pkt))
         {
@@ -97,6 +106,17 @@ int main(int argc, char *argv[])
                 new_pes_pts  = out_start_file_pts +
                                 (int64_t)(curr_pes_pts - g_file_first_pts);
                 pes_set_pts(pes_data, new_pes_pts);
+
+                if(pid == vid_pid_num) {
+                    double dur_sec;
+                    dur_sec = ((curr_pes_pts - g_file_first_pts) & 0x1ffffffff)/90000.0;
+                    if(output_duration > 0. &&  dur_sec > output_duration) {
+                        std::cout << curr_pes_pts << "  " << g_file_first_pts << std::endl;
+                        std::cout << "Exiting " << output_duration << "s  " << dur_sec << std::endl;
+                        break;
+                    }
+                }
+
             }
             if(pes_has_dts(pes_data))
             {
@@ -136,6 +156,7 @@ int main(int argc, char *argv[])
         n_pkts++;
         //std::cout << n_pkts <<std::endl;
     }
+    ofs.close();
     std::cout << "Completed" << std::endl;
 }
 
