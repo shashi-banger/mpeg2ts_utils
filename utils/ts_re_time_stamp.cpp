@@ -7,6 +7,8 @@
 #include "bitstream/mpeg/ts.h"
 #include "bitstream/mpeg/pes.h"
 
+// NOTE: duration_sec is optional. If not present the input ts will not be truncated otherwise
+// the input file will be truncated to the given input duration in seconds
 #define USAGE "./ts_re_time_stamp <input_ts_file> <out_ts_file> <start_pts(should correspond to first video pts of new ts)> <duration_sec(e..g 4.8, 5.75 etc)>"
 
 #define INVALID_PTS 0xffffffffffffULL

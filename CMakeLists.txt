@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 
 PROJECT(MPEG2TS_UTILS C CXX)
 
@@ -11,7 +11,8 @@ SET( CMAKE_CXX_FLAGS_RELEASE "-g -Wall -fpermissive")
 ADD_DEFINITIONS(-D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 )
 
 INCLUDE_DIRECTORIES(${MPEG2TS_UTILS_SOURCE_DIR}
-                    ${MPEG2TS_UTILS_SOURCE_DIR}/inc)
+                    ${MPEG2TS_UTILS_SOURCE_DIR}/inc
+                    ${MPEG2TS_UTILS_SOURCE_DIR}/utils)
 
 SET(EXECUTABLE_OUTPUT_PATH ${MPEG2TS_UTILS_SOURCE_DIR}/bin)
 
@@ -58,3 +59,8 @@ ADD_EXECUTABLE(utc_to_pts_map
 
 ADD_EXECUTABLE(scte_packet_reader
         ${MPEG2TS_UTILS_SOURCE_DIR}/utils/scte_packet_reader.cpp)
+
+ADD_EXECUTABLE(pid_remap_app
+                ${MPEG2TS_UTILS_SOURCE_DIR}/utils/pid_remap.cpp
+                ${MPEG2TS_UTILS_SOURCE_DIR}/utils/pid_remap_app.cpp)
+TARGET_LINK_LIBRARIES(pid_remap_app stdc++)
