@@ -33,14 +33,14 @@ int PidRemapper::scan_pat(unsigned char *ts_pkt) {
     }
     
     pat_found_ = true;
-    printf("pat found %d\n", pmt_pid_);
+    printf("pat found pmt_pid=%d\n", pmt_pid_);
     return 0;
 }
 
 int PidRemapper::update_pat(unsigned char *ts_pkt) {
     unsigned char    *prog;
     unsigned char *pat;
-    int pmt_pid;
+    //int pmt_pid;
     int i;
     
     
@@ -51,12 +51,8 @@ int PidRemapper::update_pat(unsigned char *ts_pkt) {
         prog = pat_get_program(pat, i);
         if(patn_get_program(prog) != 0)
         {
-            pmt_pid = patn_get_pid(prog);
-            if (pid_remap_.find(pmt_pid) != pid_remap_.end()) {
-                //std::cout << "inp_pid:" << pmt_pid << " output_pid:" << pid_remap_[pmt_pid] << std::endl;
-                patn_set_pid(prog, (uint16_t)pid_remap_[pmt_pid]);
-            }
-            //std::cout << "PMT pid:" << patn_get_pid(prog) << std::endl;
+            //pmt_pid = patn_get_pid(prog);
+            patn_set_pid(prog, (uint16_t)output_pmt_pid_);
             break;
         }
     }
@@ -73,9 +69,8 @@ int PidRemapper::update_pmt(unsigned char *ts_pkt) {
 
     pid_num = ts_get_pid(ts_pkt);
     
-    if (pid_remap_.find(pid_num) != pid_remap_.end()) {
-        ts_set_pid(ts_pkt, (uint16_t)pid_remap_[pid_num]);
-    }
+    // Modifify the ts packet pid to match the output_pmt_pid_
+    ts_set_pid(ts_pkt, (uint16_t)output_pmt_pid_);
 
     pmt = ts_section(ts_pkt);
     pcr_pid_num = pmt_get_pcrpid(pmt);

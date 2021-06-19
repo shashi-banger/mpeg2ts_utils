@@ -12,6 +12,7 @@ class PidRemapper
     std::map<int, int> pid_remap_;
     int pmt_pid_;
     bool pat_found_;
+    int  output_pmt_pid_;
 
     int scan_pat(unsigned char *ts_pkt);
     int update_pat(unsigned char *ts_pkt);
@@ -25,7 +26,8 @@ public:
      * @param remap_data: String of the form "17:280,256:400,257:480" i.e. i
      * nput_pid:output_pid which is comma separated 
      */
-    PidRemapper(std::string remap_data) : pat_found_(false)
+    PidRemapper(int output_pmt_pid, std::string remap_data) : 
+                pat_found_(false), output_pmt_pid_(output_pmt_pid)
     {
         char *token;
         char *rest = (char*)remap_data.c_str();

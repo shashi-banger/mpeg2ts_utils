@@ -17,10 +17,10 @@
 #include "pid_remap.hpp"
 
 
-#define USAGE "./pid_remap_app <input_ts_file> <out_ts_file> <remap_string(e.g. \"17:100,256:481,257:492\")>"
+#define USAGE "./pid_remap_app <input_ts_file> <out_ts_file> <output_pmt_ptd> <remap_string(e.g. \"17:100,256:481,257:492\")>"
 
 int main(int argc, char *argv[]) {
-    if(argc < 4) {
+    if(argc < 5) {
         std::cout << USAGE << std::endl;
         exit(1);
     }
@@ -30,10 +30,11 @@ int main(int argc, char *argv[]) {
     char *inp_filename = argv[1];
     char *out_filename = argv[2];
     unsigned char  ts_pkt[256];
-    std::string remap_string = std::string(argv[3]);
+    int  output_pmt_pid = atoi(argv[3]);
+    std::string remap_string = std::string(argv[4]);
 
     PidRemapper  *pid_remapper;
-    pid_remapper = new PidRemapper(remap_string);
+    pid_remapper = new PidRemapper(output_pmt_pid, remap_string);
 
     ifs.open(inp_filename, std::ios::in);
     if(!ifs.is_open()) {
