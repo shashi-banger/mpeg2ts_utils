@@ -107,11 +107,12 @@ int main(int argc, char *argv[])
                     curr_pes_pts : g_file_first_pts;*/
                 new_pes_pts  = out_start_file_pts +
                                 (int64_t)(curr_pes_pts - g_file_first_pts);
+                new_pes_pts = (new_pes_pts & 0x1ffffffffL);
                 pes_set_pts(pes_data, new_pes_pts);
 
                 if(pid == vid_pid_num) {
                     double dur_sec;
-                    dur_sec = ((curr_pes_pts - g_file_first_pts) & 0x1ffffffff)/90000.0;
+                    dur_sec = ((curr_pes_pts - g_file_first_pts) & 0x1ffffffffL)/90000.0;
                     if(output_duration > 0. &&  dur_sec > output_duration) {
                         std::cout << curr_pes_pts << "  " << g_file_first_pts << std::endl;
                         std::cout << "Exiting " << output_duration << "s  " << dur_sec << std::endl;
