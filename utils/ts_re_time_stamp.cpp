@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
         output_duration = atof(argv[4]);
     }
 
-    /* Scan input for the first PTS correspnfing to input reference pid */
+    /* Scan input for the first PTS corresponding to input reference pid */
     while(!ifs.eof()) {
         ifs.read((char*)ts_pkt, 188);
         pid = ts_get_pid(ts_pkt);
@@ -92,8 +92,16 @@ int main(int argc, char *argv[])
 
     std::cout << "H1" << std::endl;
 
-    while(!ifs.eof()) {
-        ifs.read((char*)ts_pkt, 188);
+    ifs.seekg (0, ifs.end);
+    int inp_file_length = ifs.tellg();
+    ifs.seekg (0, ifs.beg);
+    int cur_pos = 0;
+    int target_bytes = 188;
+    while(cur_pos < inp_file_length) {
+        if (inp_file_length - cur_pos < 188) {
+            target_bytes = inp_file_length - cur_pos;
+        }
+        ifs.read((char*)ts_pkt, target_bytes);
         pid = ts_get_pid(ts_pkt);
 
         if(ts_get_unitstart(ts_pkt))
@@ -155,8 +163,11 @@ int main(int argc, char *argv[])
         }
 
         if(g_file_first_pts != INVALID_PTS)
-            ofs.write((char*)ts_pkt, 188);
+        {
+            ofs.write((char*)ts_pkt, target_bytes);
+        }
         n_pkts++;
+        cur_pos = cur_pos + target_bytes;
         //std::cout << n_pkts <<std::endl;
     }
     ofs.close();
