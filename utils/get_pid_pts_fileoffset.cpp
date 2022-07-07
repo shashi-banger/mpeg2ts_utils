@@ -2,10 +2,11 @@
 #include <fstream>
 #include <map>
 #include <algorithm>
+#include <string.h>
 #include "bitstream/mpeg/ts.h"
 #include "bitstream/mpeg/pes.h"
 
-#define USAGE "./get_pid_pts_fileoffset <input_ts_file> <out_csv_file>"
+#define USAGE "./get_pid_pts_fileoffset <input_ts_file> <out_csv/json_file>"
 
 #define INVALID_PTS 0xffffffffffffULL
 
@@ -71,6 +72,20 @@ static uint64_t  get_cur_pcr(pcr_derive_info  *pcr_info)
     return ret_val;
 }
 
+bool is_json_output(char *out_filename)
+{
+    if(strlen(out_filename) > 5)
+    {
+        int last_position = strlen(out_filename)-1;
+        if(out_filename[last_position-3] == 'j' && 
+        out_filename[last_position-2] == 's' && 
+        out_filename[last_position-1] == 'o' && 
+        out_filename[last_position] == 'n')
+            return true;
+    }
+    return false;
+}
+
 int main(int argc, char *argv[])
 {
     if(argc < 3) {
@@ -92,6 +107,8 @@ int main(int argc, char *argv[])
     pcr_derive_info   pcr_info = {0,};
     uint64_t          cur_pcr;
     uint64_t          cur_pos;
+    bool out_in_json = is_json_output(out_filename);
+    bool is_first = true;
 
     pcr_info.prev_pcr = -1;
     pcr_info.prev_prev_pcr = -1;
@@ -108,6 +125,8 @@ int main(int argc, char *argv[])
         std::cout << "Unable to open " << out_filename;
         exit(1);
     }
+    if(out_in_json)
+        ofs << "{\"pts\":["<< std::endl;
 
     std::cout << "H1" << std::endl;
 
@@ -149,22 +168,46 @@ int main(int argc, char *argv[])
             cur_pcr = get_cur_pcr(&pcr_info);
             if(cur_pcr != (uint64_t)(-1))
             {
+                if(out_in_json)
+                {
+                    if(!is_first)
+                    {
+                        ofs << ","<<std::endl;
+                    }
+                    if(is_first)
+                    {
+                        is_first = false;
+                    }
+                }
                 if(curr_pes_dts != INVALID_PTS)
                 {
-                    ofs << inp_pid << "," << cur_pcr/(300 * 90) << "," << curr_pes_pts/90 << "," <<
-                        curr_pes_dts/90 <<
-                        "," << cur_pos << "," <<  (curr_pes_pts - curr_pes_dts)/90 << std::endl;
+                    if(out_in_json)
+                        ofs << "{\"pid\":" << inp_pid << ", " << "\"pcr\":" << cur_pcr/(300 * 90) << ",\"pts\":" << curr_pes_pts/90 << ",\"dts\":" <<
+                            curr_pes_dts/90 <<
+                            ",\"cur_pos\":" << cur_pos << ",\"pts_dts_offset\":" <<  (curr_pes_pts - curr_pes_dts)/90 << "}"<<std::endl;
+                    else
+                        ofs << inp_pid << "," << cur_pcr/(300 * 90) << "," << curr_pes_pts/90 << "," <<
+                            curr_pes_dts/90 <<
+                            "," << cur_pos << "," <<  (curr_pes_pts - curr_pes_dts)/90 << std::endl;
                 }
                 else
                 {
-                    ofs << inp_pid << "," << cur_pcr/(300 * 90) << "," << curr_pes_pts/90 << "," <<
-                         -1 <<
-                        "," << cur_pos << "," << -1 << std::endl;
+                    if(out_in_json)
+                        ofs << "{\"pid\":" << inp_pid << ", " << "\"pcr\":" << cur_pcr/(300 * 90) << ",\"pts\":" << curr_pes_pts/90 << ",\"dts\":" <<
+                            -1 <<
+                            ",\"cur_pos\":" << cur_pos << ",\"pts_dts_offset\":" <<  -1 << "}"<<std::endl;
+                    else
+                        ofs << inp_pid << "," << cur_pcr/(300 * 90) << "," << curr_pes_pts/90 << "," <<
+                            -1 <<
+                            "," << cur_pos << "," << -1 << std::endl;
                 }
             }
         }
         n_pkts++;
         //std::cout << n_pkts <<std::endl;
     }
+    if(out_in_json)
+        ofs << "]}"<<std::endl;
+
     std::cout << "Completed" << std::endl;
 }
